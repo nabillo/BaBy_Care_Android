@@ -1,18 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp" >
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:paddingLeft="16dp"
+	android:paddingRight="16dp" >
     
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="@string/camera_text"
-        android:drawableBottom="@drawable/camera_icon"
-        android:drawablePadding="16dp"
-        android:background="@drawable/camera_custom"
-        android:onClick="camera_launch"
-    /Button>
+	<Button
+		android:id="@+id/camera_button"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_centerHorizontal="true"
+		android:text="@string/camera_text"
+		android:background="@drawable/camera_custom"
+		android:onClick="camera_launch"/>
+	
+	<Button
+		android:id="@+id/voice_button"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_above="@id/camera_button"
+		android:layout_centerHorizontal="true"
+		android:text="@string/voice_text"
+		android:background="@drawable/voice_custom"
+		android:onClick="voice_launch"/>
+		
+	<Button
+		android:id="@+id/alarm_button"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="16dp"
+		android:layout_marginRight="16dp"
+		android:layout_above="@id/voice_button"
+		android:layout_centerHorizontal="true"
+		android:text="@string/alarme_text"
+		android:background="@drawable/alarm_custom"
+		android:onClick="alarm_launch"/>
+		
+	<ToggleButton
+		android:id="@+id/mobile_button"
+		android:layout_width="96dp"
+		android:layout_height="wrap_content"
+		android:layout_above="@id/alarm_button"
+		android:layout_toLeftOf="@id/media_button"
+		android:textOn="@string/mobile_on"
+		android:textOff="@string/mobile_off"
+		android:background="@drawable/mobile_custom"
+		android:onClick="mobile_toogle"/>
+	
+	<Button
+		android:id="@+id/media_button"
+		android:layout_width="96dp"
+		android:layout_height="wrap_content"
+		android:layout_above="@id/alarm_button"
+		android:layout_centerHorizontal="true"
+		android:text="@string/media_text"
+		android:background="@drawable/media_custom"
+		android:onClick="media_launch"/>
+	
+	<ToggleButton
+		android:id="@+id/led_button"
+		android:layout_width="96dp"
+		android:layout_height="wrap_content"
+		android:layout_above="@id/led_button"
+		android:layout_toRightOf="@id/media_button"
+		android:textOn="@string/led_on"
+		android:textOff="@string/led_off"
+		android:background="@drawable/led_custom"
+		android:onClick="led_toogle"/>
+		
 </RelativeLayout>
