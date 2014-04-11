@@ -11,6 +11,7 @@ public class CameraActivity extends Activity {
 
 	private SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 	private GestureDetectorCompat mDetector;
+	final private VideoView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -19,10 +20,22 @@ public class CameraActivity extends Activity {
 		
 		mDetector = new GestureDetectorCompat(this, new MyGestureListener());
 		
+		cameraView = (VideoView) findViewById(R.id.cameraView);
 		// Implemente camera view with url of motion webserver
-		final VideoView cameraView = (VideoView) findViewById(R.id.cameraView);
-		videoView.setVideoPath(sharedPref.getString(SettingsActivity.KEY_PREF_CAM_URL, ""));
+		cameraView.setVideoPath(sharedPref.getString(SettingsActivity.KEY_PREF_CAM_URL, ""));
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
 		cameraView.start();
+		
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		cameraView.stopPlayback();
 	}
 
 	@Override 
@@ -30,20 +43,27 @@ public class CameraActivity extends Activity {
 		this.mDetector.onTouchEvent(event);
 		return super.onTouchEvent(event);
 	}
-
+	
 	class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 		
 		@Override
-		public boolean onDown(MotionEvent event) { 
+		public boolean onDown(MotionEvent event) {
 			return true;
 		}
 		
 		@Override
 		public boolean onFling(MotionEvent event1, MotionEvent event2, 
 				float velocityX, float velocityY) {
-			// Start voice chat if scroll speed was high enough
+			// Close camera view if scroll speed was high enough
 			if (velocityY > 10)
-				
+				finish();
+			return true;
+		}
+		
+		@Override
+		public boolean onDown(MotionEvent event) {
+			// Launch voice chat
+			
 			return true;
 		}
 	}
