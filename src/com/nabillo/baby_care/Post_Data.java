@@ -1,5 +1,4 @@
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +17,7 @@ public class Post_Data
 {
 	private String url = null;
 	private JSONObject json_data = null;
+	private JSONObject json_rep = null;
 	
 	public void post_Data(String url, Map json_map)
 	{
@@ -79,15 +79,18 @@ public class Post_Data
 			        	e.printStackTrace();
 				    }
 				}
-				text = sb.toString();
+				json_rep = new JSONObject(json_data);
 			}
-			
-			tv.setText(text);
 		
 		}catch (ClientProtocolException e) {
 		    // TODO : Auto-generated catch block
 		} catch (IOException e) {
 		    // TODO : Auto-generated catch block
 		}
+	}
+	
+	public String get_Element(key)
+	{
+		return json_rep.getString(key);
 	}
 }
