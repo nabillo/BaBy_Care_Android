@@ -1,96 +1,78 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
- 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Post_Data 
 {
-	private String url = null;
-	private JSONObject json_data = null;
-	private JSONObject json_rep = null;
+	private String addr = null;
+	private String json_data = null;
+	HttpURLConnection urlConnection=null;
 	
-	public void post_Data(String url, Map json_map)
+	public void post_Data(String addr, String json_data)
 	{
-		this.url = url;
-		set_Data(json_map)
+		this.addr = addr;
+		this.json_data = json_data;
 	}
 	
-	private void set_Data(Map json_map)
+	public boolean isConnected()
 	{
-		json_data = new JSONObject();
-		Iterator<Entry<String, String>> iterator = json_map.entrySet().iterator();
-		while (iterator.hasNext()) 
-		{
-			Map.Entry<String,String> pairs = (Map.Entry<String,String>)iterator.next();
-			String key = pairs.getKey();
-			String value =  pairs.getValue();
-			json_data.put(key, value);
-		}
-		
+		ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
+		    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+		    if (networkInfo != null && networkInfo.isConnected())
+	    		return true;
+		    else
+	    		return false;
 	}
 	
 	public void post_Data() throws JSONException
-	{  
-		// Create a new HttpClient and Post Header
-		HttpClient httpclient = new DefaultHttpClient();
-		HttpPost httppost = new HttpPost(url);
-		
-		try {
+	{
+		try
+		{
+			URL url = new URL(addr);  
+			urlConnection = (HttpURLConnection) url.openConnection();
+			urlConnection.setDoInput (true);
+			urlConnection.setDoOutput(true);   
+			urlConnection.setRequestMethod("POST");  
+			urlConnection.setUseCaches(false);  
+			urlConnection.setConnectTimeout(10000);  
+			urlConnection.setReadTimeout(10000);  
+			urlConnection.setRequestProperty("Content-Type","application/json");   
+			urlConnection.connect();
 			
-			JSONArray postjson=new JSONArray();
-			postjson.put(json_data);
-			
-			// Post the data:
-			httppost.setHeader("json",json_data.toString());
-			httppost.getParams().setParameter("jsonpost",postjson);
-			
-			// Execute HTTP Post Request
-			HttpResponse response = httpclient.execute(httppost);
-			
-			// for JSON:
-			if(response != null)
+			OutputStreamWriter out = new   OutputStreamWriter(urlConnection.getOutputStream());
+
+			out.writeUTF(URLEncoder.encode(json_data,"UTF-8"));
+			out.flush ();
+			out.close ();
+            
+			int HttpResult =urlConnection.getResponseCode();
+			if(HttpResult ==HttpURLConnection.HTTP_OK)
 			{
-				InputStream is = response.getEntity().getContent();
-				
-				BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-				StringBuilder sb = new StringBuilder();
-				
+				BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"utf-8"));
 				String line = null;
-				try {
-					while ((line = reader.readLine()) != null) {
-				    	sb.append(line + "\n");
-					}
-				} catch (IOException e) {
-			    	e.printStackTrace();
-				} finally {
-				    try {
-				        is.close();
-				    } catch (IOException e) {
-			        	e.printStackTrace();
-				    }
+				while ((line = br.readLine()) != null)
+				{
+				    sb.append(line + "\n");
 				}
-				json_rep = new JSONObject(json_data);
+				br.close();
+				
+				System.out.println(""+sb.toString());
+				return sb.toString()
+			
+			}
+			else
+			{  
+				System.out.println(urlConnection.getResponseMessage());  
 			}
 		
-		}catch (ClientProtocolException e) {
+		}catch (MalformedURLException e) {
 		    // TODO : Auto-generated catch block
 		} catch (IOException e) {
 		    // TODO : Auto-generated catch block
 		}
-	}
-	
-	public String get_Element(key)
-	{
-		return json_rep.getString(key);
 	}
 }
