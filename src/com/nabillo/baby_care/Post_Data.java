@@ -6,19 +6,21 @@ import java.io.InputStreamReader;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Post_Data 
+public class Post_Data extends AsyncTask<Void, Void, String>
 {
 	private String addr = null;
 	private String json_data = null;
-	HttpURLConnection urlConnection=null;
+	private HttpURLConnection urlConnection=null;
 	
-	public void post_Data(String addr, String json_data)
+	private static final String TAG = "Post_Data";
+	
+	public void Post_Data (String addr, String json_data)
 	{
 		this.addr = addr;
 		this.json_data = json_data;
 	}
 	
-	public boolean isConnected()
+	private boolean isConnected()
 	{
 		ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
 		    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -28,20 +30,27 @@ public class Post_Data
 	    		return false;
 	}
 	
-	public void post_Data() throws JSONException
+	private String send()
 	{
+		String result;
+		
+		if (!isConnected())
+		{
+			Toast.makeText(getApplicationContext(), R.String.Not_Connected, Toast.LENGTH_SHORT).show();
+			return "Error"
+		}
 		try
 		{
 			URL url = new URL(addr);  
 			urlConnection = (HttpURLConnection) url.openConnection();
 			urlConnection.setDoInput (true);
 			urlConnection.setDoOutput(true);   
-			urlConnection.setRequestMethod("POST");  
-			urlConnection.setUseCaches(false);  
-			urlConnection.setConnectTimeout(10000);  
-			urlConnection.setReadTimeout(10000);  
-			urlConnection.setRequestProperty("Content-Type","application/json");   
-			urlConnection.connect();
+			urlConnection.setRequestMethod ("POST");  
+			urlConnection.setUseCaches (false);  
+			urlConnection.setConnectTimeout (10000);  
+			urlConnection.setReadTimeout (10000);  
+			urlConnection.setRequestProperty ("Content-Type","application/json");   
+			urlConnection.connect ();
 			
 			OutputStreamWriter out = new   OutputStreamWriter(urlConnection.getOutputStream());
 
@@ -50,7 +59,9 @@ public class Post_Data
 			out.close ();
             
 			int HttpResult =urlConnection.getResponseCode();
-			if(HttpResult ==HttpURLConnection.HTTP_OK)
+			urlConnection.disconnect();
+			
+			if (HttpResult ==HttpURLConnection.HTTP_OK)
 			{
 				BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"utf-8"));
 				String line = null;
@@ -61,18 +72,51 @@ public class Post_Data
 				br.close();
 				
 				System.out.println(""+sb.toString());
-				return sb.toString()
-			
+				result = sb.toString();
 			}
 			else
 			{  
 				System.out.println(urlConnection.getResponseMessage());  
 			}
 		
-		}catch (MalformedURLException e) {
-		    // TODO : Auto-generated catch block
-		} catch (IOException e) {
-		    // TODO : Auto-generated catch block
 		}
+		catch (MalformedURLException e)
+		{
+		    Log.e(TAG, "URL malformed : "+e.printStackTrace());
+		}
+		catch (JSONException e)
+		{
+			Log.e(TAG, "URL malformed : "+e.printStackTrace());
+		}
+		catch (IOException e)
+		{
+		    Log.e(TAG, e.printStackTrace());
+		}
+		finally
+		{  
+			if (urlConnection!=null)
+				urlConnection.disconnect();
+			return result;
+		}
+	}
+	
+	@Override
+	protected void onPreExecute() {
+		super.onPreExecute();
+		progress.setVisibility(View.VISIBLE);
+	}
+	
+	@Override
+	protected String doInBackground(Void...params)
+	{
+		// Post request and retrive response from raspi
+		return send();
+	}
+	
+	@Override
+	protected void onPostExecute(String result) {
+		progressBar.setVisibility(View.INVISIBLE);
+		// Set result flag positionned on activity
+		return result;
 	}
 }
