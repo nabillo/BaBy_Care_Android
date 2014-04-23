@@ -71,12 +71,12 @@ public class Post_Data extends AsyncTask<Void, Void, String>
 				}
 				br.close();
 				
-				System.out.println(""+sb.toString());
 				result = sb.toString();
 			}
 			else
 			{  
-				System.out.println(urlConnection.getResponseMessage());  
+				// Erreur HTTP
+				result = "Error"
 			}
 		
 		}
@@ -90,7 +90,7 @@ public class Post_Data extends AsyncTask<Void, Void, String>
 		}
 		catch (IOException e)
 		{
-		    Log.e(TAG, e.printStackTrace());
+			Log.e(TAG, e.printStackTrace());
 		}
 		finally
 		{  
