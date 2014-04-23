@@ -61,9 +61,9 @@ public class CameraActivity extends Activity {
 		}
 		
 		@Override
-		public boolean onDown(MotionEvent event) {
+		public boolean onLongPress(MotionEvent event) {
 			// Launch voice chat
-			
+			startActivity(new Intent(this, VoiceActivity.class));
 			return true;
 		}
 	}
